@@ -56,6 +56,9 @@ class _MainFetchDataState extends State<MyApp> {
 
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          title: Text("Travelask"),
+        ),
           body: isLoading
               ? Center(
                   child: CircularProgressIndicator(),

@@ -1,35 +1,39 @@
 
 import 'package:flutter/material.dart';
 import 'package:travelask_test/country.dart';
+import 'package:travelask_test/city.dart';
+import 'package:travelask_test/place.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PlacesScreen extends StatefulWidget {
   // Declare a field that holds the Todo
   final Country country;
+  final City city;
 
   // In the constructor, require a Todo
-  PlacesScreen({Key key, @required this.country}) : super(key: key);
+  PlacesScreen({Key key, @required this.country, @required this.city}) : super(key: key);
 
   @override
   State createState() {
-    return _PlacesyState(country: country);
+    return _PlacesyState(country: country, city: city);
   }
 }
 
 class _PlacesyState extends State<PlacesScreen> {
   final Country country;
+  final City city;
 
   var isLoading = false;
   var items;
 
-  _PlacesyState({Key key, @required this.country});
+  _PlacesyState({Key key, @required this.country, @required this.city});
   @override
   Widget build(BuildContext context) {
     // Use the Todo to create our UI
     return Scaffold(
       appBar: AppBar(
-        title: Text(country.name),
+        title: Text(city.name),
       ),
       body: isLoading
           ? Center(
@@ -38,7 +42,16 @@ class _PlacesyState extends State<PlacesScreen> {
           : ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return ListTile(title: Text('${items[index].name}'));
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Image.network(items[index].image),
+                Text(items[index].address)
+              ],
+            ),
+          );
+
+          //title: Text('${items[index].name} ${items[index].address}'));
         },
       ),
     );
@@ -62,13 +75,12 @@ class _PlacesyState extends State<PlacesScreen> {
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     print(basicAuth);
 
-    final response = await http.get("http://stage7.rs0.ru/mapi/v1/cities?filter[country_id_eq]=${country.id}",
+    final response = await http.get("http://stage7.rs0.ru/mapi/v1/places?filter[country_id_eq]=${country.id}&filter[city_id_eq]=${city.id}",
         headers: {'authorization': basicAuth});
 
     if (response.statusCode == 200) {
-      items = (json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => new Country.fromJson(data))
+      items = (json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => new Place.fromJson(data))
           .toList();
-      print(items.map((country) => {country.name}));
       setState(() {
         isLoading = false;
       });

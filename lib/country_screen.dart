@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travelask_test/country.dart';
+import 'package:travelask_test/city.dart';
+import 'package:travelask_test/places_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -37,10 +39,16 @@ class _CountryState extends State<CountryScreen> {
             : ListView.builder(
           itemCount: items.length,
           itemBuilder: (context, index) {
-            return ListTile(title: Text('${items[index].name}'));
+            return ListTile(title: Text('${items[index].name}'), onTap: () => onTapped(country, items[index], context),);
           },
         ),
       );
+    }
+
+    void onTapped(Country country, City city, BuildContext context) {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => PlacesScreen(country: country, city: city)
+      ));
     }
 
   @override
@@ -65,9 +73,8 @@ class _CountryState extends State<CountryScreen> {
         headers: {'authorization': basicAuth});
 
     if (response.statusCode == 200) {
-      items = (json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => new Country.fromJson(data))
+      items = (json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => new City.fromJson(data))
           .toList();
-      print(items.map((country) => {country.name}));
       setState(() {
         isLoading = false;
       });
